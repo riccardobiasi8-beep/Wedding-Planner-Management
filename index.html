@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Matrimoni">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/icon-192.png">
+<title>Wedding Planner</title>
+<style>
+:root{
+  --bg:#F2F2F7;--card:#FFFFFF;--text:#1C1C1E;--sub:#6E6E73;--sep:rgba(60,60,67,.18);
+  --fill:rgba(120,120,128,.12);--bar:rgba(249,249,249,.84);--seg-on:#FFFFFF;
+  --accent:#4E7D6A;--accent-soft:rgba(78,125,106,.13);--gold:#A8844F;--on-acc:#FFFFFF;
+  --green:#2E9B5F;--orange:#C97A1E;--blue:#2F6FD6;--red:#D33B32;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  --serif:"New York",ui-serif,"Iowan Old Style","Palatino",Georgia,serif;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#000000;--card:#1C1C1E;--text:#F5F5F7;--sub:#98989F;--sep:rgba(84,84,88,.55);
+  --fill:rgba(120,120,128,.24);--bar:rgba(24,24,26,.84);--seg-on:#636366;
+  --accent:#86BBA5;--accent-soft:rgba(134,187,165,.16);--gold:#D6B47E;--on-acc:#08130E;
+  --green:#4CC683;--orange:#F0A24A;--blue:#5E9BFF;--red:#FF6A5F;
+}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;font-family:var(--sans);font-size:17px;line-height:1.35;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+body.home{padding-bottom:calc(32px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:720px;margin:0 auto}
+
+/* Barra superiore */
+.nav{position:sticky;top:0;z-index:20;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);padding-top:env(safe-area-inset-top);border-bottom:.5px solid var(--sep)}
+.nav-in{position:relative;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;max-width:720px;margin:0 auto}
+.nav-title{position:absolute;left:50%;transform:translateX(-50%);font-weight:600;font-size:17px;white-space:nowrap;max-width:55%;overflow:hidden;text-overflow:ellipsis}
+.nav-side{display:flex;align-items:center;gap:2px;min-width:44px}
+.back{display:flex;align-items:center;gap:2px;border:0;background:none;color:var(--accent);font-size:17px;padding:8px 6px}
+.ibtn{width:40px;height:40px;border:0;background:none;color:var(--accent);display:grid;place-items:center;border-radius:20px}
+.ibtn svg{width:24px;height:24px}
+
+/* Titoli */
+.lt{font-size:34px;font-weight:700;letter-spacing:.01em;margin:8px 20px 4px}
+.lt-sub{margin:0 20px 18px;color:var(--sub);font-size:15px}
+.sh{font-size:13px;color:var(--sub);margin:0 32px 7px;display:flex;justify-content:space-between;align-items:baseline}
+.sh button{border:0;background:none;color:var(--accent);font-size:15px;padding:0}
+
+/* Liste raggruppate */
+.group{background:var(--card);border-radius:12px;margin:0 16px 26px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:11px 16px;min-height:46px;position:relative;width:100%;text-align:left;border:0;background:none}
+.row+.row::before{content:"";position:absolute;top:0;right:0;left:16px;height:.5px;background:var(--sep)}
+.row.ind+.row.ind::before{left:52px}
+button.row:active,.tap:active{background:var(--fill)}
+.row.col{flex-direction:column;align-items:stretch;gap:6px}
+.grow{flex:1;min-width:0}
+.tap{cursor:pointer;border-radius:8px}
+.ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:14px;color:var(--sub);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.late{color:var(--red)}
+.val{color:var(--sub);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chev{color:var(--sub);opacity:.5;flex:none}
+.link-row{color:var(--accent)}
+.danger-btn{color:var(--red);justify-content:center}
+.empty{text-align:center;color:var(--sub);padding:28px 32px;font-size:15px}
+.empty b{display:block;color:var(--text);font-size:17px;margin-bottom:4px}
+.btn{display:inline-block;margin-top:14px;border:0;background:var(--accent);color:#fff;font-weight:600;padding:12px 22px;border-radius:12px}
+@media (prefers-color-scheme:dark){.btn{color:#08130E}}
+
+/* Home: matrimoni */
+.dblock{width:48px;flex:none;text-align:center}
+.dblock b{display:block;font-size:24px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.dblock span{font-size:12px;color:var(--accent);font-weight:600;text-transform:capitalize}
+.wnames{font-family:var(--serif);font-size:20px;line-height:1.2}
+.days{font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:99px;white-space:nowrap}
+.days.past{color:var(--sub);background:var(--fill)}
+
+/* Hero matrimonio */
+.hero{text-align:center;padding:18px 24px 26px}
+.hero-date{color:var(--sub);font-size:15px;margin:0;text-transform:none}
+.names{font-family:var(--serif);font-weight:400;font-size:clamp(36px,10.5vw,52px);line-height:1.04;letter-spacing:-.01em;margin:10px 0 14px}
+.names .amp{display:block;font-style:italic;color:var(--gold);font-size:.82em;line-height:1.05}
+.hero-count{display:inline-block;font-size:15px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:7px 16px;border-radius:99px;margin:0}
+
+/* Riquadri riepilogo */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 16px 26px}
+.tile{background:var(--card);border-radius:16px;padding:14px 14px 16px;border:0;text-align:left;display:flex;flex-direction:column;gap:2px}
+.tile:active{transform:scale(.98)}
+.tile-h{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--accent);margin-bottom:6px}
+.tile-h svg{width:18px;height:18px}
+.tile-v{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.tile-s{font-size:13px;color:var(--sub)}
+.bar{height:5px;border-radius:3px;background:var(--fill);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.bar.over i{background:var(--red)}
+
+/* Spunte */
+.chk{width:24px;height:24px;flex:none;border-radius:50%;border:1.6px solid var(--sub);background:none;display:grid;place-items:center;padding:0;opacity:.75}
+.chk.on{background:var(--accent);border-color:var(--accent);opacity:1}
+.chk svg{width:14px;height:14px;color:#fff;opacity:0}
+.chk.on svg{opacity:1}
+.struck{color:var(--sub);text-decoration:line-through}
+
+/* Pillole stato */
+.pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap;border:0;flex:none}
+.p-green{color:var(--green);background:color-mix(in srgb,var(--green) 14%,transparent)}
+.p-orange{color:var(--orange);background:color-mix(in srgb,var(--orange) 14%,transparent)}
+.p-blue{color:var(--blue);background:color-mix(in srgb,var(--blue) 14%,transparent)}
+.p-red{color:var(--red);background:color-mix(in srgb,var(--red) 12%,transparent)}
+.p-grey{color:var(--sub);background:var(--fill)}
+
+/* Controllo segmentato */
+.seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;margin:0 16px 18px}
+.seg button{flex:1;border:0;background:transparent;padding:6px 4px;border-radius:7px;font-size:13px;font-weight:500}
+.seg button.on{background:var(--seg-on);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+
+/* Statistiche */
+.stats{display:flex;gap:8px;margin:0 16px 14px;overflow-x:auto;scrollbar-width:none}
+.stat{flex:1;min-width:76px;background:var(--card);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--sub)}
+.note-line{margin:-4px 32px 18px;font-size:13px;color:var(--sub)}
+
+.search{margin:0 16px 14px;display:flex;align-items:center;gap:6px;background:var(--fill);border-radius:10px;padding:0 10px;height:38px;color:var(--sub)}
+.search svg{width:17px;height:17px;flex:none}
+.search input{flex:1;border:0;background:none;outline:none;font-size:17px;color:var(--text);min-width:0}
+
+/* Budget */
+.bsum{background:var(--card);border-radius:16px;margin:0 16px 26px;padding:18px 16px}
+.bsum-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.bsum-v{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.bsum-l{font-size:14px;color:var(--sub)}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.bgrid div{font-size:12px;color:var(--sub)}
+.bgrid b{display:block;font-size:16px;color:var(--text);font-variant-numeric:tabular-nums;font-weight:600}
+
+/* Programma */
+.time{width:50px;flex:none;font-weight:600;font-variant-numeric:tabular-nums;color:var(--accent)}
+
+/* Barra schede */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar-in{display:grid;grid-template-columns:repeat(5,1fr);max-width:720px;margin:0 auto}
+.tabbar button{border:0;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0 5px;font-size:10px;font-weight:500}
+.tabbar svg{width:26px;height:26px}
+.tabbar button.on{color:var(--accent)}
+
+/* Fogli modali */
+.ov{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0);transition:background .28s;display:flex;align-items:flex-end;justify-content:center}
+.ov.open{background:rgba(0,0,0,.38)}
+.sheet{background:var(--bg);width:100%;max-width:720px;max-height:calc(100% - env(safe-area-inset-top) - 24px);border-radius:14px 14px 0 0;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.72,0,1)}
+.ov.open .sheet{transform:none}
+.sh-head{display:flex;align-items:center;justify-content:space-between;padding:12px 8px;position:relative}
+.sh-head strong{position:absolute;left:50%;transform:translateX(-50%);font-size:17px;white-space:nowrap}
+.sh-head .lnk{border:0;background:none;color:var(--accent);font-size:17px;padding:6px 10px}
+.sh-head .lnk.b{font-weight:600}
+.sh-body{overflow-y:auto;padding:8px 0 calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+.fl{flex:none;width:42%;color:var(--text)}
+.row input,.row select{flex:1;min-width:0;border:0;background:none;text-align:right;outline:none;font-size:17px;color:var(--sub);padding:0;-webkit-appearance:none;appearance:none}
+.row input:focus,.row select:focus{color:var(--text)}
+.row input[type=date],.row input[type=time]{min-height:24px;display:flex;justify-content:flex-end}
+.row select{direction:rtl;text-align-last:right}
+.row textarea{border:0;background:none;outline:none;resize:vertical;font-size:17px;min-height:70px;padding:0;color:var(--text)}
+.row.col .fl{width:auto;font-size:14px;color:var(--sub)}
+.hint{font-size:13px;color:var(--sub);margin:-18px 32px 22px}
+
+/* Menu azioni */
+.as{width:100%;max-width:440px;padding:0 10px calc(10px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.ov.open .as{transform:none}
+.as-group,.as-cancel{background:var(--bar);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);border-radius:14px;overflow:hidden}
+.as-title{font-size:13px;color:var(--sub);text-align:center;padding:13px 16px;border-bottom:.5px solid var(--sep)}
+.as button{display:block;width:100%;border:0;background:none;color:var(--accent);font-size:19px;padding:16px;text-align:center}
+.as-group button+button{border-top:.5px solid var(--sep)}
+.as button.danger{color:var(--red)}
+.as-cancel{margin-top:8px}
+.as-cancel button{font-weight:600}
+
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:rgba(30,30,32,.92);color:#fff;font-size:15px;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;z-index:80;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+@media (min-width:700px){.tiles{grid-template-columns:repeat(4,1fr)}}
+
+/* Gantt */
+.p-acc{color:var(--accent);background:var(--accent-soft)}
+.gantt{background:var(--card);border-radius:12px;margin:0 16px 12px;overflow:hidden}
+.g-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.g-inner{position:relative}
+.g-row{display:flex;min-height:46px;position:relative}
+.g-row+.g-row{border-top:.5px solid var(--sep)}
+.g-row[data-a]{cursor:pointer}
+.g-row[data-a]:active .g-lab{background:var(--fill)}
+.g-lab{position:sticky;left:0;z-index:3;flex:none;width:var(--lab);background:var(--card);padding:6px 10px 6px 14px;display:flex;flex-direction:column;justify-content:center;border-right:.5px solid var(--sep);min-width:0}
+.g-lab .ttl{font-size:14px;line-height:1.25;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.g-lab .sub{font-size:12px}
+.g-track{position:relative;flex:none}
+.g-head{min-height:40px}
+.g-head .g-lab{font-size:12px;color:var(--sub)}
+.g-mon{position:absolute;top:5px;font-size:12px;font-weight:600;padding-left:6px;white-space:nowrap;text-transform:capitalize}
+.g-tick{position:absolute;bottom:4px;font-size:11px;color:var(--sub);padding-left:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.g-sec{min-height:30px}
+.g-sec,.g-sec .g-lab{background:var(--bg)}
+.g-sec .g-lab{font-size:13px;font-weight:600;color:var(--sub);justify-content:center}
+.g-bar{position:absolute;top:50%;height:22px;margin-top:-11px;border-radius:6px;background:var(--accent);min-width:6px;color:var(--on-acc);font-size:11px;font-weight:600;line-height:22px;padding:0 7px;font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-ms{position:absolute;top:50%;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;transform:rotate(45deg);border-radius:2px;background:var(--accent)}
+.g-done{opacity:.35}
+.g-lines{position:absolute;top:0;bottom:0;left:var(--lab);right:0;pointer-events:none}
+.g-vl{position:absolute;top:0;bottom:0;border-left:.5px solid var(--sep)}
+.g-vl.minor{border-left-style:dashed;opacity:.6}
+.g-vl.today{border-left:2px solid var(--red);z-index:2}
+.g-vl.wed{border-left:2px solid var(--gold);z-index:2}
+.legend{display:flex;gap:6px 14px;flex-wrap:wrap;margin:0 32px 24px;font-size:12px;color:var(--sub)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.vico{width:24px;flex:none;color:var(--accent);display:grid;place-items:center}
+.vico svg{width:20px;height:20px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- Dati di base ---------- */
+const KEY = 'wedplan_v1';
+const TASK_CATS = ['Pianificazione','Location','Fornitori','Abiti e beauty','Carta e grafica','Invitati','Documenti','Ultimi giorni'];
+const TASK_TEMPLATE = [
+  [12,'Pianificazione','Definire il budget complessivo con gli sposi'],
+  [12,'Pianificazione','Fissare la data del matrimonio'],
+  [12,'Location','Prenotare la location della cerimonia'],
+  [12,'Location','Prenotare la location del ricevimento'],
+  [12,'Invitati','Stilare la lista invitati preliminare'],
+  [10,'Fornitori','Scegliere fotografo'],
+  [10,'Fornitori','Scegliere videomaker'],
+  [10,'Fornitori','Scegliere catering'],
+  [10,'Fornitori','Scegliere musica o DJ'],
+  [9,'Pianificazione','Definire tema, palette e stile'],
+  [8,'Abiti e beauty','Prima prova abito sposa'],
+  [8,'Fornitori','Scegliere fiorista e allestimenti'],
+  [6,'Carta e grafica','Inviare i save the date'],
+  [6,'Carta e grafica','Ordinare le partecipazioni'],
+  [6,'Fornitori','Scegliere le bomboniere'],
+  [6,'Abiti e beauty','Scegliere abito sposo'],
+  [6,'Pianificazione','Prenotare il viaggio di nozze'],
+  [4,'Fornitori','Degustazione menu'],
+  [4,'Fornitori','Scegliere la torta nuziale'],
+  [4,'Fornitori','Ordinare le fedi'],
+  [4,'Abiti e beauty','Prova trucco e parrucco'],
+  [3,'Carta e grafica','Spedire le partecipazioni'],
+  [3,'Documenti','Avviare le pubblicazioni e i documenti'],
+  [2,'Abiti e beauty','Seconda prova abito'],
+  [2,'Carta e grafica','Libretto della cerimonia e tableau'],
+  [1,'Invitati','Raccogliere le ultime conferme'],
+  [1,'Invitati','Disposizione dei tavoli'],
+  [1,'Fornitori','Comunicare i numeri definitivi al catering'],
+  [1,'Fornitori','Inviare il programma del giorno ai fornitori'],
+  [0.25,'Ultimi giorni','Saldare i fornitori'],
+  [0.25,'Ultimi giorni','Confermare orari e arrivi'],
+  [0.25,'Ultimi giorni','Preparare il kit di emergenza'],
+];
+const BUDGET_SPLIT = [['Location e catering',45],['Fotografia e video',12],['Abiti e beauty',10],['Fiori e allestimenti',8],['Musica e intrattenimento',6],['Fedi',4],['Partecipazioni e grafica',3],['Bomboniere',3],['Trasporti',3],['Altro',6]];
+const BUDGET_CATS = BUDGET_SPLIT.map(x=>x[0]);
+const VENDOR_CATS = ['Location','Catering','Fotografo','Videomaker','Fiorista','Musica e DJ','Atelier','Trucco e parrucco','Pasticceria','Grafica','Trasporti','Altro'];
+const VENDOR_STATES = ['Da contattare','Preventivo richiesto','Preventivo ricevuto','Confermato','Consegnato','Scartato'];
+const VENDOR_BAR = {'Da contattare':'var(--sub)','Preventivo richiesto':'var(--orange)','Preventivo ricevuto':'var(--blue)','Confermato':'var(--accent)','Consegnato':'var(--green)'};
+const VENDOR_COLORS = {'Da contattare':'p-grey','Preventivo richiesto':'p-orange','Preventivo ricevuto':'p-blue','Confermato':'p-acc','Consegnato':'p-green','Scartato':'p-red'};
+const RSVP = ['In attesa','Confermato','Non viene'];
+const RSVP_COLORS = {'In attesa':'p-orange','Confermato':'p-green','Non viene':'p-grey'};
+const MENUS = ['Standard','Vegetariano','Vegano','Pesce','Senza glutine','Bambini'];
+const PROGRAM_TEMPLATE = [['14:30','15:00','Arrivo invitati'],['15:00','16:00','Cerimonia'],['16:00','16:45','Foto di coppia'],['16:30','19:00','Aperitivo'],['19:30','22:30','Cena'],['22:30','23:00','Taglio della torta'],['23:00','02:00','Primo ballo e festa']];
+
+/* ---------- Utilità ---------- */
+const $ = s => document.querySelector(s);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = n => { const v = Math.round(Number(n) || 0); return (v < 0 ? '-' : '') + String(Math.abs(v)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' €'; };
+const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+const iso = x => x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+const today = () => { const t = new Date(); t.setHours(0,0,0,0); return t; };
+const fmtD = (d, o={day:'numeric',month:'long',year:'numeric'}) => d ? new Date(d+'T00:00').toLocaleDateString('it-IT', o) : '';
+const daysTo = d => d ? Math.round((new Date(d+'T00:00') - today()) / 864e5) : null;
+const monthsBefore = (d, m) => { const x = new Date(d+'T00:00'); if (m < 1) x.setDate(x.getDate() - Math.round(m*30)); else x.setMonth(x.getMonth() - m); return iso(x); };
+const dueOf = (w, t) => t.due || (w.data && t.m != null ? monthsBefore(w.data, t.m) : '');
+const shortD = d => fmtD(d, new Date(d+'T00:00').getFullYear() === new Date().getFullYear() ? {day:'numeric',month:'short'} : {day:'numeric',month:'short',year:'numeric'});
+/* orari della giornata: dopo mezzanotte (prima delle 6) conta come stesso giorno */
+const tmin = t => { if (!t) return null; const [h,m] = t.split(':').map(Number); const v = h*60 + (m||0); return v < 360 ? v + 1440 : v; };
+const hhmm = v => String(Math.floor(v/60) % 24).padStart(2,'0') + ':' + String(v % 60).padStart(2,'0');
+const progSorted = w => [...w.programma].sort((a,b) => (tmin(a.ora) ?? 0) - (tmin(b.ora) ?? 0));
+const pct = (a, b) => b > 0 ? Math.min(100, Math.round(a / b * 100)) : 0;
+const persons = g => Number(g.n) || 1;
+const costOf = s => Number(s.eff) || Number(s.prev) || 0;
+
+const I = {
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M15 5l-7 7 7 7"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  more:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"/><circle cx="7.8" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.2" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  chev:'<svg class="chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/></svg>',
+  overview:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0112 7.3a4.2 4.2 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></svg>',
+  tasks:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9.5"/></svg>',
+  budget:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M16 15h2"/></svg>',
+  guests:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c0-3.3 2.7-5.8 6-5.8s6 2.5 6 5.8"/><circle cx="17" cy="9.5" r="2.4"/><path d="M16.2 14c2.8.2 4.8 2.4 4.8 5.3"/></svg>',
+  vendors:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M9 8V5.8c0-.7.6-1.3 1.3-1.3h3.4c.7 0 1.3.6 1.3 1.3V8M3.5 13h17"/></svg>',
+};
+const TABS = [['overview','Panoramica'],['tasks','Attività'],['budget','Budget'],['guests','Invitati'],['vendors','Fornitori']];
+
+/* ---------- Stato ---------- */
+let S = load();
+const UI = { view:'home', wid:null, tab:'overview', sub:null, taskFilter:'todo', taskMode:'list', zoom:'m', guestMode:'list', q:'' };
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || { weddings:[] }; } catch(e){ return { weddings:[] }; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ toast('Memoria piena: esporta un backup'); } }
+const W = () => S.weddings.find(x => x.id === UI.wid);
+const commit = () => { save(); render(); };
+
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 2000); }
+
+/* ---------- Fogli e menu ---------- */
+function fieldHTML(vals){
+  return f => {
+    const v = vals[f.k] ?? f.def ?? '';
+    if (f.type === 'textarea') return `<label class="row col"><span class="fl">${f.label}</span><textarea name="${f.k}" rows="${f.rows||3}" placeholder="${esc(f.ph||'')}">${esc(v)}</textarea></label>`;
+    if (f.type === 'select') return `<label class="row"><span class="fl">${f.label}</span><select name="${f.k}">${f.options.map(o=>`<option${o===v?' selected':''}>${esc(o)}</option>`).join('')}</select></label>`;
+    const type = f.type === 'number' ? 'text" inputmode="decimal' : (f.type || 'text');
+    const shown = f.type === 'number' && !v ? '' : v;
+    return `<label class="row"><span class="fl">${f.label}</span><input name="${f.k}" type="${type}" value="${esc(shown)}" placeholder="${esc(f.ph||'')}" autocomplete="off"></label>`;
+  };
+}
+
+function sheet({ title, fields, values = {}, onSave, onDelete, saveLabel = 'Salva', hint = '' }){
+  const ov = document.createElement('div');
+  ov.className = 'ov';
+  ov.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+    <div class="sh-head"><button class="lnk" data-x="cancel">Annulla</button><strong>${esc(title)}</strong><button class="lnk b" data-x="save">${saveLabel}</button></div>
+    <div class="sh-body"><div class="group">${fields.map(fieldHTML(values)).join('')}</div>
+    ${hint ? `<p class="hint">${hint}</p>` : ''}
+    ${onDelete ? `<div class="group"><button class="row danger-btn" data-x="del">Elimina</button></div>` : ''}</div></div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('open')));
+  const close = () => { ov.classList.remove('open'); setTimeout(() => ov.remove(), 320); };
+  ov.addEventListener('click', e => {
+    if (e.target === ov) return close();
+    const x = e.target.closest('[data-x]')?.dataset.x;
+    if (x === 'cancel') close();
+    if (x === 'save') {
+      const v = {};
+      fields.forEach(f => {
+        let val = ov.querySelector(`[name="${f.k}"]`).value.trim();
+        if (f.type === 'number') val = val === '' ? 0 : (parseFloat(val.replace(/\./g,'').replace(',','.')) || 0);
+        v[f.k] = val;
+      });
+      const missing = fields.find(f => f.req && !v[f.k]);
+      if (missing) return toast(`Inserisci: ${missing.label.toLowerCase()}`);
+      if (onSave(v) === false) return;
+      close();
+    }
+    if (x === 'del' && confirm('Eliminare definitivamente?')) { onDelete(); close(); }
+  });
+  if (!matchMedia('(pointer:coarse)').matches) setTimeout(() => ov.querySelector('input,textarea')?.focus(), 340);
+}
+
+function actionSheet(items, title){
+  const ov = document.createElement('div');
+  ov.className = 'ov';
+  ov.innerHTML = `<div class="as" role="menu">
+    <div class="as-group">${title ? `<div class="as-title">${esc(title)}</div>` : ''}${items.map((it,i)=>`<button data-i="${i}" class="${it.danger?'danger':''}">${esc(it.label)}</button>`).join('')}</div>
+    <div class="as-cancel"><button data-i="c">Annulla</button></div></div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('open')));
+  const close = () => { ov.classList.remove('open'); setTimeout(() => ov.remove(), 300); };
+  ov.addEventListener('click', e => {
+    if (e.target === ov) return close();
+    const i = e.target.closest('[data-i]')?.dataset.i;
+    if (i == null) return;
+    close();
+    if (i !== 'c') setTimeout(() => items[+i].fn(), 200);
+  });
+}
+
+/* ---------- Form ---------- */
+const weddingFields = [
+  {k:'p1', label:'Sposo/a', ph:'Nome', req:true},
+  {k:'p2', label:'Sposo/a', ph:'Nome', req:true},
+  {k:'data', label:'Data', type:'date'},
+  {k:'ora', label:'Ora cerimonia', type:'time'},
+  {k:'cerimonia', label:'Cerimonia', ph:'Chiesa o comune'},
+  {k:'ricevimento', label:'Ricevimento', ph:'Location'},
+  {k:'budget', label:'Budget', type:'number', ph:'€'},
+  {k:'tel', label:'Telefono', type:'tel', ph:'Contatto sposi'},
+  {k:'email', label:'Email', type:'email', ph:'Contatto sposi'},
+  {k:'note', label:'Note', type:'textarea', ph:'Stile, palette, richieste particolari'},
+];
+const taskFields = [
+  {k:'t', label:'Attività', ph:'Cosa fare', req:true},
+  {k:'cat', label:'Categoria', type:'select', options:TASK_CATS},
+  {k:'start', label:'Inizio', type:'date'},
+  {k:'due', label:'Scadenza', type:'date'},
+  {k:'note', label:'Note', type:'textarea'},
+];
+const badRange = (a, b, msg) => { if (a && b && a > b) { toast(msg); return true; } return false; };
+const spesaFields = [
+  {k:'voce', label:'Voce', ph:'Es. Fotografo', req:true},
+  {k:'cat', label:'Categoria', type:'select', options:BUDGET_CATS},
+  {k:'prev', label:'Preventivo', type:'number', ph:'€'},
+  {k:'eff', label:'Costo effettivo', type:'number', ph:'€'},
+  {k:'pagato', label:'Già pagato', type:'number', ph:'€'},
+  {k:'scad', label:'Prossimo pagamento', type:'date'},
+  {k:'note', label:'Note', type:'textarea'},
+];
+const guestFields = w => [
+  {k:'nome', label:'Nome', ph:'Nome e cognome', req:true},
+  {k:'gruppo', label:'Invitato da', type:'select', options:[w.p1, w.p2, 'Entrambi']},
+  {k:'n', label:'Persone', type:'number', def:1},
+  {k:'rsvp', label:'Risposta', type:'select', options:RSVP},
+  {k:'menu', label:'Menu', type:'select', options:MENUS},
+  {k:'tavolo', label:'Tavolo', ph:'Numero o nome'},
+  {k:'tel', label:'Telefono', type:'tel'},
+  {k:'note', label:'Allergie e note', type:'textarea'},
+];
+const vendorFields = [
+  {k:'nome', label:'Nome', ph:'Azienda', req:true},
+  {k:'cat', label:'Categoria', type:'select', options:VENDOR_CATS},
+  {k:'stato', label:'Stato', type:'select', options:VENDOR_STATES},
+  {k:'ref', label:'Referente'},
+  {k:'tel', label:'Telefono', type:'tel'},
+  {k:'email', label:'Email', type:'email'},
+  {k:'costo', label:'Preventivo', type:'number', ph:'€'},
+  {k:'lav', label:'Lavorazione', ph:'Es. stampa partecipazioni'},
+  {k:'inizio', label:'Inizio lavori', type:'date'},
+  {k:'consegna', label:'Consegna', type:'date'},
+  {k:'note', label:'Note', type:'textarea'},
+];
+const progFields = w => [
+  {k:'ora', label:'Inizio', type:'time', req:true},
+  {k:'fine', label:'Fine', type:'time'},
+  {k:'att', label:'Momento', ph:'Es. Aperitivo', req:true},
+  {k:'luogo', label:'Luogo'},
+  {k:'resp', label:'Fornitore', type:'select', options:['Nessuno', ...w.fornitori.filter(f=>f.stato!=='Scartato').map(f=>f.nome)]},
+  {k:'note', label:'Note', type:'textarea', rows:2},
+];
+
+/* ---------- Azioni ---------- */
+const A = {
+  newWedding(){
+    sheet({ title:'Nuovo matrimonio', fields:weddingFields, saveLabel:'Crea',
+      hint:'Con data e budget creo la checklist con le scadenze e una ripartizione del budget, che puoi modificare.',
+      onSave: v => {
+        const w = { id:uid(), ...v, created:Date.now(), tasks:[], spese:[], ospiti:[], fornitori:[], programma:[] };
+        w.tasks = TASK_TEMPLATE.map(([m,cat,t]) => ({ id:uid(), t, cat, m, done:false }));
+        if (v.budget > 0) w.spese = BUDGET_SPLIT.map(([cat,p]) => ({ id:uid(), voce:cat, cat, prev:Math.round(v.budget*p/100), eff:0, pagato:0 }));
+        S.weddings.push(w); UI.wid = w.id; UI.view = 'wedding'; UI.tab = 'overview';
+        commit(); scrollTo(0,0); toast('Matrimonio creato');
+      }});
+  },
+  open(id){ UI.view='wedding'; UI.wid=id; UI.tab='overview'; UI.sub=null; UI.q=''; render(); scrollTo(0,0); },
+  openDay(){ UI.sub='day'; render(); scrollTo(0,0); },
+  closeSub(){ UI.sub=null; render(); scrollTo(0,0); },
+  taskMode(id){ UI.taskMode=id; render(); },
+  zoom(id){ UI.zoom=id; render(); },
+  dayZoom(id){ UI.dayZoom=id; render(); },
+  back(){ UI.view='home'; render(); scrollTo(0,0); },
+  tab(id){ UI.tab=id; UI.sub=null; render(); scrollTo(0,0); },
+  editW(){
+    const w = W();
+    sheet({ title:'Dettagli', fields:weddingFields, values:w, onSave: v => { Object.assign(w, v); commit(); toast('Dettagli salvati'); } });
+  },
+  wMenu(){
+    const w = W();
+    actionSheet([
+      { label:'Modifica dettagli', fn:A.editW },
+      { label:'Esporta questo matrimonio', fn:() => exportJSON({ weddings:[w] }, `matrimonio-${w.p1}-${w.p2}`) },
+      { label:'Elimina matrimonio', danger:true, fn:() => { if (confirm(`Eliminare il matrimonio di ${w.p1} e ${w.p2}?`)) { S.weddings = S.weddings.filter(x=>x.id!==w.id); UI.view='home'; commit(); toast('Matrimonio eliminato'); } } },
+    ], `${w.p1} e ${w.p2}`);
+  },
+  homeMenu(){
+    actionSheet([
+      { label:'Esporta backup', fn:() => exportJSON(S, 'matrimoni-backup') },
+      { label:'Importa backup', fn:() => $('#importFile').click() },
+    ]);
+  },
+  add(){
+    const w = W();
+    if (UI.sub === 'day') return A.addProg();
+    if (UI.tab === 'tasks') sheet({ title:'Nuova attività', fields:taskFields, saveLabel:'Aggiungi', onSave: v => { if (badRange(v.start, v.due, "L'inizio deve precedere la scadenza")) return false; w.tasks.push({ id:uid(), ...v, done:false }); commit(); } });
+    if (UI.tab === 'budget') sheet({ title:'Nuova spesa', fields:spesaFields, saveLabel:'Aggiungi', onSave: v => { w.spese.push({ id:uid(), ...v }); commit(); } });
+    if (UI.tab === 'vendors') sheet({ title:'Nuovo fornitore', fields:vendorFields, saveLabel:'Aggiungi', onSave: v => { if (badRange(v.inizio, v.consegna, 'Inizio lavori deve precedere la consegna')) return false; w.fornitori.push({ id:uid(), ...v }); commit(); } });
+    if (UI.tab === 'guests') actionSheet([
+      { label:'Nuovo invitato', fn:() => sheet({ title:'Nuovo invitato', fields:guestFields(w), saveLabel:'Aggiungi', onSave: v => { w.ospiti.push({ id:uid(), ...v, n:v.n||1 }); commit(); } }) },
+      { label:'Incolla un elenco di nomi', fn:A.bulkGuests },
+    ]);
+  },
+  bulkGuests(){
+    const w = W();
+    sheet({ title:'Elenco invitati', saveLabel:'Aggiungi',
+      fields:[ {k:'nomi', label:'Un nome per riga', type:'textarea', rows:10, req:true}, {k:'gruppo', label:'Invitati da', type:'select', options:[w.p1, w.p2, 'Entrambi']} ],
+      hint:'Puoi incollare la lista da WhatsApp, Note o Excel.',
+      onSave: v => {
+        const names = v.nomi.split(/\n/).map(s=>s.replace(/^[\s\-•*\d.)]+/,'').trim()).filter(Boolean);
+        names.forEach(nome => w.ospiti.push({ id:uid(), nome, gruppo:v.gruppo, n:1, rsvp:'In attesa', menu:'Standard', tavolo:'' }));
+        commit(); toast(`${names.length} invitati aggiunti`);
+      }});
+  },
+  toggleTask(id){ const t = W().tasks.find(x=>x.id===id); t.done = !t.done; commit(); },
+  editTask(id){
+    const w = W(), t = w.tasks.find(x=>x.id===id), comp = (t.m != null && w.data) ? monthsBefore(w.data, t.m) : '';
+    sheet({ title:'Attività', fields:taskFields, values:{ ...t, due:dueOf(w,t) },
+      onSave: v => { if (badRange(v.start, v.due, "L'inizio deve precedere la scadenza")) return false; const due = v.due; delete v.due; Object.assign(t, v); if (due !== comp) { t.m = null; t.due = due; } commit(); },
+      onDelete: () => { w.tasks = w.tasks.filter(x=>x.id!==id); commit(); } });
+  },
+  taskFilter(id){ UI.taskFilter = id; render(); },
+  editSpesa(id){
+    const w = W(), s = w.spese.find(x=>x.id===id);
+    sheet({ title:'Spesa', fields:spesaFields, values:s, onSave: v => { Object.assign(s, v); commit(); }, onDelete: () => { w.spese = w.spese.filter(x=>x.id!==id); commit(); } });
+  },
+  editGuest(id){
+    const w = W(), g = w.ospiti.find(x=>x.id===id);
+    sheet({ title:'Invitato', fields:guestFields(w), values:g, onSave: v => { Object.assign(g, v, { n:v.n||1 }); commit(); }, onDelete: () => { w.ospiti = w.ospiti.filter(x=>x.id!==id); commit(); } });
+  },
+  rsvp(id){ const g = W().ospiti.find(x=>x.id===id); g.rsvp = RSVP[(RSVP.indexOf(g.rsvp)+1) % RSVP.length]; save(); renderGuestList(); renderGuestStats(); },
+  guestMode(id){ UI.guestMode = id; render(); },
+  editVendor(id){
+    const w = W(), f = w.fornitori.find(x=>x.id===id);
+    sheet({ title:'Fornitore', fields:vendorFields, values:f, onSave: v => { if (badRange(v.inizio, v.consegna, 'Inizio lavori deve precedere la consegna')) return false; Object.assign(f, v); commit(); }, onDelete: () => { w.fornitori = w.fornitori.filter(x=>x.id!==id); commit(); } });
+  },
+  addProg(){ const w = W(); sheet({ title:'Nuovo momento', fields:progFields(w), saveLabel:'Aggiungi', onSave: v => { w.programma.push({ id:uid(), ...v }); commit(); } }); },
+  progTemplate(){ W().programma = PROGRAM_TEMPLATE.map(([ora,fine,att]) => ({ id:uid(), ora, fine, att, luogo:'', resp:'Nessuno' })); commit(); toast('Programma tipo aggiunto'); },
+  editProg(id){
+    const w = W(), p = w.programma.find(x=>x.id===id);
+    sheet({ title:'Momento', fields:progFields(w), values:p, onSave: v => { Object.assign(p, v); commit(); }, onDelete: () => { w.programma = w.programma.filter(x=>x.id!==id); commit(); } });
+  },
+  noop(){},
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-a]');
+  if (!el || el.closest('.ov')) return;
+  A[el.dataset.a]?.(el.dataset.id, el, e);
+});
+
+/* ---------- Backup ---------- */
+async function exportJSON(data, name){
+  const fname = `${name}-${iso(new Date())}.json`.replace(/\s+/g,'-').toLowerCase();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  const file = new File([blob], fname, { type:'application/json' });
+  if (navigator.canShare?.({ files:[file] })) { try { await navigator.share({ files:[file], title:fname }); return; } catch(e){ if (e.name === 'AbortError') return; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  toast('Backup esportato');
+}
+$('#importFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    const list = Array.isArray(d.weddings) ? d.weddings : (d.p1 ? [d] : null);
+    if (!list) throw 0;
+    list.forEach(w => { const i = S.weddings.findIndex(x=>x.id===w.id); i >= 0 ? S.weddings[i] = w : S.weddings.push(w); });
+    commit(); toast(`${list.length} matrimoni importati`);
+  } catch(err){ toast('File non valido: scegli un backup .json'); }
+  e.target.value = '';
+});
+
+/* ---------- Viste ---------- */
+function nav(left, title, right){
+  return `<header class="nav"><div class="nav-in"><div class="nav-side">${left}</div>${title?`<div class="nav-title">${esc(title)}</div>`:''}<div class="nav-side" style="justify-content:flex-end">${right}</div></div></header>`;
+}
+function countText(d){
+  if (d == null) return 'Data da definire';
+  if (d > 1) return `Mancano ${d} giorni`;
+  if (d === 1) return 'Domani';
+  if (d === 0) return 'Oggi è il giorno';
+  return `Celebrato ${-d} giorni fa`;
+}
+
+function homeView(){
+  const list = [...S.weddings].sort((a,b) => (a.data||'9999').localeCompare(b.data||'9999'));
+  const up = list.filter(w => (daysTo(w.data) ?? 1) >= 0), past = list.filter(w => daysTo(w.data) < 0).reverse();
+  const card = w => {
+    const d = daysTo(w.data), done = w.tasks.filter(t=>t.done).length;
+    const conf = w.ospiti.filter(g=>g.rsvp==='Confermato').reduce((a,g)=>a+persons(g),0);
+    return `<button class="row" data-a="open" data-id="${w.id}">
+      <div class="dblock">${w.data ? `<b>${new Date(w.data+'T00:00').getDate()}</b><span>${fmtD(w.data,{month:'short'})}</span>` : '<span>—</span>'}</div>
+      <div class="grow"><div class="wnames ttl">${esc(w.p1)} e ${esc(w.p2)}</div>
+      <div class="sub">${esc(w.ricevimento || w.cerimonia || 'Location da definire')}</div>
+      <div class="sub">${done} di ${w.tasks.length} attività, ${conf} confermati</div></div>
+      ${d != null ? `<span class="days ${d<0?'past':''}">${d<0 ? fmtD(w.data,{year:'numeric'}) : d===0 ? 'Oggi' : d+' gg'}</span>` : ''}${I.chev}</button>`;
+  };
+  return nav('', '', `<button class="ibtn" data-a="homeMenu" aria-label="Backup">${I.more}</button><button class="ibtn" data-a="newWedding" aria-label="Nuovo matrimonio">${I.plus}</button>`) +
+  `<main class="wrap"><h1 class="lt">Matrimoni</h1>
+   <p class="lt-sub">${up.length ? (up.length === 1 ? '1 matrimonio in programma' : `${up.length} matrimoni in programma`) : 'Nessun matrimonio in programma'}</p>
+   ${!list.length ? `<div class="empty"><b>Inizia dal primo matrimonio</b>Inserisci i nomi degli sposi, la data e il budget: checklist e budget si preparano da soli.<br><button class="btn" data-a="newWedding">Aggiungi matrimonio</button></div>` : ''}
+   ${up.length ? `<div class="group">${up.map(card).join('')}</div>` : ''}
+   ${past.length ? `<div class="sh">Celebrati</div><div class="group">${past.map(card).join('')}</div>` : ''}
+  </main>`;
+}
+
+function overviewView(w){
+  const d = daysTo(w.data);
+  const tDone = w.tasks.filter(t=>t.done).length;
+  const stima = w.spese.reduce((a,s)=>a+costOf(s),0), budget = Number(w.budget)||0;
+  const tot = w.ospiti.filter(g=>g.rsvp!=='Non viene').reduce((a,g)=>a+persons(g),0);
+  const conf = w.ospiti.filter(g=>g.rsvp==='Confermato').reduce((a,g)=>a+persons(g),0);
+  const vConf = w.fornitori.filter(f=>['Confermato','Consegnato'].includes(f.stato)).length, vTot = w.fornitori.filter(f=>f.stato!=='Scartato').length;
+  const next = [
+    ...w.tasks.filter(t=>!t.done).map(t=>({...t,d:dueOf(w,t)})).filter(t=>t.d),
+    ...w.fornitori.filter(f=>f.consegna && !['Consegnato','Scartato'].includes(f.stato)).map(f=>({...f,d:f.consegna,vendor:true})),
+  ].sort((a,b)=>a.d.localeCompare(b.d)).slice(0,5);
+  const prog = progSorted(w);
+  const tile = (tab, icon, label, val, sub, p, over) => `<button class="tile" data-a="tab" data-id="${tab}"><span class="tile-h">${icon}${label}</span><span class="tile-v">${val}</span><span class="tile-s">${sub}</span><span class="bar ${over?'over':''}"><i style="width:${p}%"></i></span></button>`;
+  return `<main class="wrap">
+    <section class="hero">
+      <p class="hero-date">${w.data ? cap(fmtD(w.data,{weekday:'long',day:'numeric',month:'long',year:'numeric'})) : 'Data da definire'}${w.ora ? `, ore ${esc(w.ora)}` : ''}</p>
+      <h1 class="names">${esc(w.p1)}<span class="amp">&amp;</span>${esc(w.p2)}</h1>
+      <p class="hero-count">${countText(d)}</p>
+    </section>
+    <div class="tiles">
+      ${tile('tasks', I.tasks, 'Attività', `${tDone}/${w.tasks.length}`, 'completate', pct(tDone, w.tasks.length))}
+      ${tile('budget', I.budget, 'Budget', eur(stima), budget ? `di ${eur(budget)}` : 'budget da definire', pct(stima, budget), budget && stima > budget)}
+      ${tile('guests', I.guests, 'Invitati', `${conf}/${tot}`, 'confermati', pct(conf, tot))}
+      ${tile('vendors', I.vendors, 'Fornitori', `${vConf}/${vTot}`, 'confermati', pct(vConf, vTot))}
+    </div>
+    <div class="sh">Prossime scadenze${next.length ? `<button data-a="tab" data-id="tasks">Vedi tutte</button>` : ''}</div>
+    <div class="group">${next.length ? next.map(x => x.vendor ? deliveryRow(x) : taskRow(x)).join('') : `<div class="row"><span class="sub">${w.data ? 'Nessuna scadenza aperta' : 'Inserisci la data per calcolare le scadenze'}</span></div>`}</div>
+    <div class="sh">Programma del giorno${prog.length ? `<button data-a="addProg">Aggiungi</button>` : ''}</div>
+    <div class="group">${prog.length ? prog.map(progRow).join('') + `<button class="row link-row" data-a="openDay">Apri la scaletta in Gantt</button>`
+      : `<button class="row link-row" data-a="progTemplate">Usa un programma tipo</button><button class="row link-row" data-a="addProg">Aggiungi un momento</button>`}</div>
+    <div class="sh">Dettagli</div>
+    <div class="group">
+      <div class="row"><span class="grow">Cerimonia</span><span class="val ttl">${esc(w.cerimonia || '—')}</span></div>
+      <div class="row"><span class="grow">Ricevimento</span><span class="val ttl">${esc(w.ricevimento || '—')}</span></div>
+      ${w.tel ? `<a class="row" href="tel:${esc(w.tel)}" style="color:inherit;text-decoration:none"><span class="grow">Telefono</span><span class="val" style="color:var(--accent)">${esc(w.tel)}</span></a>` : ''}
+      ${w.email ? `<a class="row" href="mailto:${esc(w.email)}" style="color:inherit;text-decoration:none"><span class="grow">Email</span><span class="val ttl" style="color:var(--accent)">${esc(w.email)}</span></a>` : ''}
+      ${w.note ? `<div class="row col"><span class="sub">Note</span><span style="white-space:pre-wrap">${esc(w.note)}</span></div>` : ''}
+      <button class="row link-row" data-a="editW">Modifica dettagli</button>
+    </div>
+  </main>`;
+}
+
+function progRow(p){
+  const bits = [p.fine ? `fino alle ${p.fine}` : '', p.resp && p.resp !== 'Nessuno' ? p.resp : '', p.luogo].filter(Boolean);
+  return `<button class="row" data-a="editProg" data-id="${p.id}"><span class="time">${esc(p.ora)}</span><div class="grow"><div class="ttl">${esc(p.att)}</div>${bits.length?`<div class="sub">${esc(bits.join(', '))}</div>`:''}</div>${I.chev}</button>`;
+}
+function deliveryRow(f){
+  const late = daysTo(f.d) < 0;
+  return `<button class="row" data-a="editVendor" data-id="${f.id}"><span class="vico">${I.vendors}</span><div class="grow"><div class="ttl">Consegna ${esc(f.lav || f.cat || '')}</div><div class="sub ${late?'late':''}">${esc(f.nome)}, entro il ${shortD(f.d)}</div></div>${I.chev}</button>`;
+}
+
+/* ---------- Gantt preparazione ---------- */
+const DAY = 864e5, toD = s => new Date(s+'T00:00');
+const gRow = (a, id, title, sub, inner, width) => `<div class="g-row" data-a="${a}" data-id="${id}"><div class="g-lab"><div class="ttl">${esc(title)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div><div class="g-track" style="width:${width}px">${inner}</div></div>`;
+const gSec = (t, width) => `<div class="g-row g-sec"><div class="g-lab">${esc(t)}</div><div class="g-track" style="width:${width}px"></div></div>`;
+
+function ganttPrep(w){
+  const vend = w.fornitori.filter(f => f.consegna && f.stato !== 'Scartato').sort((a,b) => (a.inizio||a.consegna).localeCompare(b.inizio||b.consegna));
+  const tasks = w.tasks.map(t => ({ ...t, d:dueOf(w,t) })).filter(t => t.d);
+  if (!vend.length && !tasks.length) return `<div class="empty"><b>Niente da mostrare</b>Inserisci la data del matrimonio, le scadenze delle attività o le date di consegna dei fornitori.</div>`;
+  const todayS = iso(today());
+  const starts = [...vend.map(f=>f.inizio||f.consegna), ...tasks.map(t=>t.start||t.d), todayS].sort();
+  const ends = [...vend.map(f=>f.consegna), ...tasks.map(t=>t.d), todayS, ...(w.data ? [w.data] : [])].sort();
+  const s0 = toD(starts[0]); s0.setDate(1);
+  const e1 = toD(ends[ends.length-1]); const e0 = new Date(e1.getFullYear(), e1.getMonth()+1, 1);
+  const px = UI.zoom === 'w' ? 14 : 4;
+  const X = d => Math.round((toD(d) - s0) / DAY) * px;
+  const width = Math.round((e0 - s0) / DAY) * px;
+  let head = '', lines = '';
+  for (let m = new Date(s0); m < e0; m.setMonth(m.getMonth()+1)) {
+    const x = X(iso(m));
+    const lab = m.toLocaleDateString('it-IT', (m.getMonth() === 0 || x === 0) ? {month:'short', year:'numeric'} : {month: px > 4 ? 'long' : 'short'});
+    head += `<span class="g-mon" style="left:${x}px">${lab}</span>`;
+    lines += `<span class="g-vl" style="left:${x}px"></span>`;
+  }
+  if (px > 4) for (let d = new Date(s0); d < e0; d.setDate(d.getDate()+1)) if (d.getDay() === 1) {
+    const x = X(iso(d)); head += `<span class="g-tick" style="left:${x}px">${d.getDate()} ${d.toLocaleDateString('it-IT',{month:'short'})}</span>`; if (d.getDate() !== 1) lines += `<span class="g-vl minor" style="left:${x}px"></span>`;
+  }
+  lines += `<span class="g-vl today" style="left:${X(todayS) + px/2}px"></span>`;
+  if (w.data) lines += `<span class="g-vl wed" style="left:${X(w.data) + px/2}px"></span>`;
+  const bar = (a, b, color, cls='') => a && a < b
+    ? `<i class="g-bar ${cls}" style="left:${X(a)}px;width:${X(b) - X(a) + px}px;background:${color}"></i>`
+    : `<i class="g-ms ${cls}" style="left:${X(b) + px/2}px;background:${color}"></i>`;
+  let rows = '';
+  if (vend.length) {
+    rows += gSec('Consegne fornitori', width);
+    vend.forEach(f => {
+      const late = f.stato !== 'Consegnato' && daysTo(f.consegna) < 0;
+      rows += gRow('editVendor', f.id, f.lav || f.nome, `${f.lav ? f.nome + ', ' : ''}${shortD(f.consegna)}`, bar(f.inizio, f.consegna, late ? 'var(--red)' : (VENDOR_BAR[f.stato] || 'var(--sub)')), width);
+    });
+  }
+  TASK_CATS.concat([...new Set(tasks.map(t=>t.cat))].filter(c=>!TASK_CATS.includes(c))).forEach(cat => {
+    const list = tasks.filter(t => t.cat === cat).sort((a,b) => a.d.localeCompare(b.d));
+    if (!list.length) return;
+    rows += gSec(cat, width);
+    list.forEach(t => {
+      const late = !t.done && daysTo(t.d) < 0;
+      rows += gRow('editTask', t.id, t.t, shortD(t.d), bar(t.start, t.d, late ? 'var(--red)' : 'var(--accent)', t.done ? 'g-done' : ''), width);
+    });
+  });
+  return `<div class="gantt" style="--lab:150px"><div class="g-scroll" data-sx="${Math.max(0, X(todayS) - 40)}"><div class="g-inner" style="width:${150 + width}px">
+    <div class="g-lines">${lines}</div>
+    <div class="g-row g-head"><div class="g-lab">${w.data ? 'Fino al ' + shortD(w.data) : ''}</div><div class="g-track" style="width:${width}px">${head}</div></div>
+    ${rows}</div></div></div>
+    <div class="legend"><span><i style="background:var(--red)"></i>Oggi e ritardi</span><span><i style="background:var(--gold)"></i>Matrimonio</span><span><i style="background:var(--accent)"></i>Attività e fornitori confermati</span><span><i style="background:var(--green)"></i>Consegnato</span></div>`;
+}
+
+/* ---------- Gantt del giorno ---------- */
+function ganttDay(w){
+  const it = progSorted(w).filter(p => p.ora).map(p => { const s = tmin(p.ora); let e = tmin(p.fine); if (e != null && e <= s) e += 1440; return { ...p, s, e }; });
+  if (!it.length) return '';
+  const t0 = Math.floor(Math.min(...it.map(x => x.s)) / 60) * 60;
+  const t1 = Math.ceil(Math.max(...it.map(x => Math.max(x.e ?? x.s, x.s + 30))) / 60) * 60;
+  const avail = Math.min(innerWidth, 720) - 32 - 140;
+  const px = UI.dayZoom === 'detail' ? 2.4 : Math.max(0.3, avail / (t1 - t0)), width = Math.round((t1 - t0) * px);
+  const step = px * 60 < 34 ? 120 : 60;
+  let head = '', lines = '';
+  for (let m = t0; m <= t1; m += 30) {
+    const x = (m - t0) * px;
+    if (m % 60 === 0) { if (m < t1 && m % step === 0) head += `<span class="g-tick" style="left:${x}px;bottom:auto;top:12px;font-size:12px;font-weight:600;color:var(--text)">${hhmm(m)}</span>`; lines += `<span class="g-vl" style="left:${x}px"></span>`; }
+    else lines += `<span class="g-vl minor" style="left:${x}px"></span>`;
+  }
+  let sx = 0;
+  if (daysTo(w.data) === 0) { const n = new Date(); const nm = tmin(hhmm(n.getHours()*60 + n.getMinutes())); if (nm >= t0 && nm <= t1) { lines += `<span class="g-vl today" style="left:${(nm - t0) * px}px"></span>`; sx = (nm - t0) * px - 60; } }
+  const rows = it.map(p => {
+    const left = (p.s - t0) * px;
+    const inner = p.e != null
+      ? `<i class="g-bar" style="left:${left}px;width:${(p.e - p.s) * px}px">${(p.e - p.s) * px > 84 ? `${esc(p.ora)}–${esc(p.fine)}` : ''}</i>`
+      : `<i class="g-ms" style="left:${left}px"></i>`;
+    const sub = [p.resp && p.resp !== 'Nessuno' ? p.resp : '', p.luogo].filter(Boolean).join(', ') || (p.fine ? `${p.ora}–${p.fine}` : p.ora);
+    return gRow('editProg', p.id, p.att, sub, inner, width);
+  }).join('');
+  return `<div class="gantt" style="--lab:140px"><div class="g-scroll" data-sx="${Math.max(0, sx)}"><div class="g-inner" style="width:${140 + width}px">
+    <div class="g-lines">${lines}</div>
+    <div class="g-row g-head"><div class="g-lab">${it.length} momenti</div><div class="g-track" style="width:${width}px">${head}</div></div>
+    ${rows}</div></div></div>
+    <p class="note-line" style="margin-top:6px">I momenti senza ora di fine sono mostrati come rombi. Tocca una riga per modificarla.</p>`;
+}
+
+function dayView(w){
+  const prog = progSorted(w);
+  const it = prog.filter(p => p.ora);
+  const first = it[0]?.ora, lastEnd = it.length ? hhmm(Math.max(...it.map(p => { const s = tmin(p.ora); let e = tmin(p.fine) ?? s; if (e < s) e += 1440; return e; }))) : '';
+  return `<main class="wrap"><h1 class="lt">Scaletta del giorno</h1>
+    <p class="lt-sub">${w.data ? cap(fmtD(w.data,{weekday:'long',day:'numeric',month:'long'})) + ', ' : ''}${it.length ? `dalle ${first} alle ${lastEnd}` : 'nessun momento in programma'}</p>
+    ${it.length ? `<div class="seg">${[['fit','Intera giornata'],['detail','Dettaglio orario']].map(([k,l])=>`<button class="${(UI.dayZoom||'fit')===k?'on':''}" data-a="dayZoom" data-id="${k}">${l}</button>`).join('')}</div>` + ganttDay(w) : `<div class="empty"><b>La scaletta è vuota</b>Aggiungi i momenti della giornata con ora di inizio e fine, oppure parti da un programma tipo.<br><button class="btn" data-a="progTemplate">Usa un programma tipo</button></div>`}
+    ${prog.length ? `<div class="sh">Momenti</div><div class="group">${prog.map(progRow).join('')}</div>` : ''}
+  </main>`;
+}
+
+function taskRow(t){
+  const late = !t.done && t.d && daysTo(t.d) < 0;
+  return `<div class="row"><button class="chk ${t.done?'on':''}" data-a="toggleTask" data-id="${t.id}" aria-label="${t.done?'Segna da fare':'Segna completata'}">${I.check}</button>
+    <div class="grow tap" data-a="editTask" data-id="${t.id}"><div class="${t.done?'struck':''}">${esc(t.t)}</div>
+    <div class="sub ${late?'late':''}">${esc(t.cat)}${t.start && t.d ? `, dal ${shortD(t.start)} al ${shortD(t.d)}` : t.d ? `, entro il ${shortD(t.d)}` : ''}</div></div></div>`;
+}
+
+function tasksView(w){
+  const f = UI.taskFilter;
+  let ts = w.tasks.map(t => ({ ...t, d:dueOf(w,t) }));
+  const done = ts.filter(t=>t.done).length;
+  if (f === 'todo') ts = ts.filter(t=>!t.done); else if (f === 'done') ts = ts.filter(t=>t.done);
+  ts.sort((a,b) => (a.d||'9999').localeCompare(b.d||'9999'));
+  const groups = new Map();
+  ts.forEach(t => {
+    const g = !t.d ? 'Senza scadenza' : (!t.done && daysTo(t.d) < 0) ? 'In ritardo' : cap(fmtD(t.d,{month:'long',year:'numeric'}));
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g).push(t);
+  });
+  const modeSeg = `<div class="seg">${[['list','Elenco'],['gantt','Gantt']].map(([k,l])=>`<button class="${UI.taskMode===k?'on':''}" data-a="taskMode" data-id="${k}">${l}</button>`).join('')}</div>`;
+  if (UI.taskMode === 'gantt') return `<main class="wrap"><h1 class="lt">Attività</h1>
+    <p class="lt-sub">Preparazione e consegne fino al giorno del matrimonio</p>${modeSeg}
+    <div class="seg" style="width:60%;margin-left:auto;margin-right:16px">${[['w','Settimane'],['m','Mesi']].map(([k,l])=>`<button class="${UI.zoom===k?'on':''}" data-a="zoom" data-id="${k}">${l}</button>`).join('')}</div>
+    ${ganttPrep(w)}</main>`;
+  return `<main class="wrap"><h1 class="lt">Attività</h1>
+    <p class="lt-sub">${done} di ${w.tasks.length} completate</p>${modeSeg}
+    <div class="seg" role="tablist">${[['todo','Da fare'],['done','Completate'],['all','Tutte']].map(([k,l])=>`<button class="${f===k?'on':''}" data-a="taskFilter" data-id="${k}">${l}</button>`).join('')}</div>
+    ${!ts.length ? `<div class="empty"><b>${f==='todo' ? 'Tutto fatto' : 'Nessuna attività'}</b>${f==='todo' ? 'Non ci sono attività aperte per questo matrimonio.' : 'Tocca + per aggiungerne una.'}</div>` : ''}
+    ${[...groups].map(([g, list]) => `<div class="sh"><span class="${g==='In ritardo'?'late':''}">${g}</span></div><div class="group">${list.map(taskRow).join('')}</div>`).join('')}
+  </main>`;
+}
+
+function budgetView(w){
+  const budget = Number(w.budget)||0;
+  const prev = w.spese.reduce((a,s)=>a+(Number(s.prev)||0),0);
+  const stima = w.spese.reduce((a,s)=>a+costOf(s),0);
+  const pag = w.spese.reduce((a,s)=>a+(Number(s.pagato)||0),0);
+  const resto = budget - stima;
+  const byCat = new Map();
+  w.spese.forEach(s => { const c = s.cat || 'Altro'; if (!byCat.has(c)) byCat.set(c, []); byCat.get(c).push(s); });
+  const cats = [...byCat].sort((a,b) => BUDGET_CATS.indexOf(a[0]) - BUDGET_CATS.indexOf(b[0]));
+  const upcoming = w.spese.filter(s => s.scad && costOf(s) - (Number(s.pagato)||0) > 0).sort((a,b)=>a.scad.localeCompare(b.scad)).slice(0,3);
+  return `<main class="wrap"><h1 class="lt">Budget</h1><p class="lt-sub">${w.spese.length} voci di spesa</p>
+    <div class="bsum">
+      <div class="bsum-top"><div><div class="bsum-l">Spesa stimata</div><div class="bsum-v">${eur(stima)}</div></div>
+      <div style="text-align:right"><div class="bsum-l">${budget ? (resto >= 0 ? 'Disponibile' : 'Sforamento') : 'Budget'}</div><div style="font-size:19px;font-weight:600;color:${resto<0&&budget?'var(--red)':'var(--text)'}">${budget ? eur(Math.abs(resto)) : '<button class="lnk" data-a="editW" style="border:0;background:none;color:var(--accent);font-size:17px;padding:0">Imposta</button>'}</div></div></div>
+      <div class="bar ${budget && stima > budget ? 'over' : ''}"><i style="width:${pct(stima, budget)}%"></i></div>
+      <div class="bgrid"><div><b>${eur(budget)}</b>Budget</div><div><b>${eur(pag)}</b>Pagato</div><div><b>${eur(stima - pag)}</b>Da pagare</div></div>
+    </div>
+    ${upcoming.length ? `<div class="sh">Prossimi pagamenti</div><div class="group">${upcoming.map(s => { const late = daysTo(s.scad) < 0; return `<button class="row" data-a="editSpesa" data-id="${s.id}"><div class="grow"><div class="ttl">${esc(s.voce)}</div><div class="sub ${late?'late':''}">${late?'Scaduto il ':'Entro il '}${fmtD(s.scad,{day:'numeric',month:'long'})}</div></div><span class="val">${eur(costOf(s) - (Number(s.pagato)||0))}</span>${I.chev}</button>`; }).join('')}</div>` : ''}
+    ${!w.spese.length ? `<div class="empty"><b>Nessuna spesa</b>Tocca + per aggiungere la prima voce, oppure imposta il budget nei dettagli.</div>` : ''}
+    ${cats.map(([c, list]) => {
+      const tot = list.reduce((a,s)=>a+costOf(s),0);
+      return `<div class="sh"><span>${esc(c)}</span><span>${eur(tot)}</span></div><div class="group">${list.map(s => {
+        const cost = costOf(s), paid = Number(s.pagato)||0;
+        const sub = s.eff ? (paid >= cost && cost ? 'Saldato' : `Pagato ${eur(paid)} di ${eur(cost)}`) : (s.prev ? 'Stima da preventivo' : 'Importo da definire');
+        return `<button class="row" data-a="editSpesa" data-id="${s.id}"><div class="grow"><div class="ttl">${esc(s.voce)}</div><div class="sub">${sub}</div></div><span class="val">${eur(cost)}</span>${I.chev}</button>`;
+      }).join('')}</div>`;
+    }).join('')}
+    ${w.spese.length && prev ? `<p class="note-line">Totale preventivi: ${eur(prev)}. Dove c'è un costo effettivo, sostituisce il preventivo nella stima.</p>` : ''}
+  </main>`;
+}
+
+function guestsView(w){
+  return `<main class="wrap"><h1 class="lt">Invitati</h1><p class="lt-sub" id="gsub"></p>
+    <div class="stats" id="gstats"></div><p class="note-line" id="gmenu"></p>
+    <div class="seg">${[['list','Elenco'],['tables','Tavoli']].map(([k,l])=>`<button class="${UI.guestMode===k?'on':''}" data-a="guestMode" data-id="${k}">${l}</button>`).join('')}</div>
+    ${UI.guestMode === 'list' && w.ospiti.length ? `<label class="search">${I.search}<input id="gq" type="search" placeholder="Cerca invitato" value="${esc(UI.q)}" aria-label="Cerca invitato"></label>` : ''}
+    <div id="glist"></div></main>`;
+}
+function renderGuestStats(){
+  const w = W(); if (!w || UI.tab !== 'guests') return;
+  const sum = r => w.ospiti.filter(g => !r || g.rsvp === r).reduce((a,g)=>a+persons(g),0);
+  $('#gsub').textContent = `${w.ospiti.length} inviti, ${sum()} persone`;
+  $('#gstats').innerHTML = [['Confermati',sum('Confermato')],['In attesa',sum('In attesa')],['Non vengono',sum('Non viene')]].map(([l,v])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+  const menus = {}; w.ospiti.filter(g=>g.rsvp==='Confermato').forEach(g => menus[g.menu||'Standard'] = (menus[g.menu||'Standard']||0) + persons(g));
+  const m = Object.entries(menus);
+  $('#gmenu').textContent = m.length ? 'Menu confermati: ' + m.map(([k,v])=>`${v} ${k.toLowerCase()}`).join(', ') : '';
+  $('#gmenu').style.display = m.length ? '' : 'none';
+}
+function guestRow(g){
+  const bits = [g.gruppo, persons(g) > 1 ? `${persons(g)} persone` : '', g.menu && g.menu !== 'Standard' ? g.menu : '', g.tavolo ? `tavolo ${g.tavolo}` : ''].filter(Boolean);
+  return `<div class="row"><div class="grow tap" data-a="editGuest" data-id="${g.id}"><div class="ttl">${esc(g.nome)}</div><div class="sub">${esc(bits.join(', '))}</div></div>
+    <button class="pill ${RSVP_COLORS[g.rsvp]||'p-orange'}" data-a="rsvp" data-id="${g.id}" aria-label="Cambia risposta">${esc(g.rsvp||'In attesa')}</button></div>`;
+}
+function renderGuestList(){
+  const w = W(), box = $('#glist'); if (!box) return;
+  if (!w.ospiti.length) { box.innerHTML = `<div class="empty"><b>Nessun invitato</b>Tocca + per aggiungerli uno alla volta o incollare un elenco di nomi.</div>`; return; }
+  if (UI.guestMode === 'list') {
+    const q = UI.q.toLowerCase();
+    const list = w.ospiti.filter(g => !q || (g.nome||'').toLowerCase().includes(q) || String(g.tavolo||'').toLowerCase() === q).sort((a,b)=>(a.nome||'').localeCompare(b.nome||'','it'));
+    box.innerHTML = list.length ? `<div class="group">${list.map(guestRow).join('')}</div><p class="hint" style="margin-top:-16px">Tocca lo stato per cambiare la risposta.</p>` : `<div class="empty">Nessun invitato trovato.</div>`;
+  } else {
+    const tables = new Map();
+    w.ospiti.filter(g=>g.rsvp!=='Non viene').forEach(g => { const t = (g.tavolo||'').trim() || '—'; if (!tables.has(t)) tables.set(t, []); tables.get(t).push(g); });
+    const keys = [...tables.keys()].sort((a,b) => a==='—' ? 1 : b==='—' ? -1 : a.localeCompare(b,'it',{numeric:true}));
+    box.innerHTML = keys.map(k => { const l = tables.get(k), n = l.reduce((a,g)=>a+persons(g),0);
+      return `<div class="sh"><span>${k==='—' ? 'Da assegnare' : 'Tavolo ' + esc(k)}</span><span>${n} ${n===1?'persona':'persone'}</span></div><div class="group">${l.map(guestRow).join('')}</div>`; }).join('')
+      + `<p class="hint" style="margin-top:-12px">Assegna il tavolo aprendo la scheda dell'invitato.</p>`;
+  }
+}
+
+function vendorsView(w){
+  const byCat = new Map();
+  w.fornitori.forEach(f => { if (!byCat.has(f.cat)) byCat.set(f.cat, []); byCat.get(f.cat).push(f); });
+  const cats = [...byCat].sort((a,b) => VENDOR_CATS.indexOf(a[0]) - VENDOR_CATS.indexOf(b[0]));
+  const conf = w.fornitori.filter(f=>['Confermato','Consegnato'].includes(f.stato));
+  return `<main class="wrap"><h1 class="lt">Fornitori</h1>
+    <p class="lt-sub">${conf.length} confermati${conf.length ? `, ${eur(conf.reduce((a,f)=>a+(Number(f.costo)||0),0))} in preventivi` : ''}</p>
+    ${!w.fornitori.length ? `<div class="empty"><b>Nessun fornitore</b>Tocca + per aggiungere location, fotografo, fiorista e gli altri fornitori.</div>` : ''}
+    ${cats.map(([c, list]) => `<div class="sh">${esc(c)}</div><div class="group">${list.map(f => `<div class="row">
+      <div class="grow tap" data-a="editVendor" data-id="${f.id}"><div class="ttl">${esc(f.nome)}</div><div class="sub ${f.consegna && !['Consegnato','Scartato'].includes(f.stato) && daysTo(f.consegna) < 0 ? 'late' : ''}">${esc([f.ref, f.costo ? eur(f.costo) : '', f.consegna ? 'consegna ' + shortD(f.consegna) : ''].filter(Boolean).join(', ') || 'Tocca per i dettagli')}</div></div>
+      ${f.tel ? `<a class="ibtn" href="tel:${esc(f.tel)}" data-a="noop" aria-label="Chiama ${esc(f.nome)}">${I.phone}</a>` : ''}
+      <span class="pill ${VENDOR_COLORS[f.stato]||'p-grey'}">${esc(f.stato||'Da contattare')}</span></div>`).join('')}</div>`).join('')}
+  </main>`;
+}
+
+function weddingView(){
+  const w = W();
+  if (!w) { UI.view = 'home'; return homeView(); }
+  const views = { overview:overviewView, tasks:tasksView, budget:budgetView, guests:guestsView, vendors:vendorsView };
+  const canAdd = UI.tab !== 'overview' || UI.sub === 'day';
+  const left = UI.sub === 'day' ? `<button class="back" data-a="closeSub">${I.back}Panoramica</button>` : `<button class="back" data-a="back">${I.back}Matrimoni</button>`;
+  return nav(left, UI.tab === 'overview' ? '' : `${w.p1} e ${w.p2}`,
+      `${canAdd ? `<button class="ibtn" data-a="add" aria-label="Aggiungi">${I.plus}</button>` : ''}<button class="ibtn" data-a="wMenu" aria-label="Opzioni">${I.more}</button>`)
+    + (UI.sub === 'day' ? dayView(w) : views[UI.tab](w))
+    + `<nav class="tabbar"><div class="tabbar-in">${TABS.map(([k,l])=>`<button class="${UI.tab===k?'on':''}" data-a="tab" data-id="${k}" aria-current="${UI.tab===k?'page':'false'}">${I[k]}${l}</button>`).join('')}</div></nav>`;
+}
+
+function render(){
+  document.body.classList.toggle('home', UI.view === 'home');
+  $('#app').innerHTML = UI.view === 'home' ? homeView() : weddingView();
+  document.querySelectorAll('[data-sx]').forEach(el => el.scrollLeft = +el.dataset.sx);
+  if (UI.view === 'wedding' && UI.tab === 'guests') {
+    renderGuestStats(); renderGuestList();
+    $('#gq')?.addEventListener('input', e => { UI.q = e.target.value; renderGuestList(); });
+  }
+}
+render();
+</script>
+</body>
+</html>
